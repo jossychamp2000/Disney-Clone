@@ -1,14 +1,40 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
+import { useParams } from "react-router-dom";
+import db from "../firebase";
+import { useHistory } from 'react-router-dom';
+
+
 
 function Detail() {
+    const { id } = useParams();
+    const history = useHistory();
+    const [ movie, setMovie ] = useState();
+
+    useEffect(()=>{
+        db.collection("movies")
+        .doc(id)
+        .get()
+        .then((doc)=>{
+            if(doc.exists) {
+                setMovie(doc.data());
+                console.log(doc.data());
+            } else {
+                history.push('/')
+            }
+        })
+    }, [])
+
     return (
         <Container>
+            { movie && (
+                <>
+           
             <Background>
-                <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/4F39B7E16726ECF419DD7C49E011DD95099AA20A962B0B10AA1881A70661CE45/scale?width=1440&aspectRatio=1.78&format=jpeg" />
+            <img src={movie.backgroundImg} />
             </Background>
             <ImageTitle>
-                <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D7AEE1F05D10FC37C873176AAA26F777FC1B71E7A6563F36C6B1B497CAB1CEC2/scale?width=1440&aspectRatio=1.78" />
+                <img src={movie.titleImg} />
             </ImageTitle>
             <Controls>
                 <PlayButton>
@@ -27,11 +53,13 @@ function Detail() {
                 </GroupWatchButton>
             </Controls>
             <SubTitle>
-                2018 • 7m • Family, Fantasy, Kids, Animation
+                {movie.SubTitle}
             </SubTitle>
             <Description>
-                A Chinese mom who’s sad when her grown son leaves home gets another chance at motherhood when one of her dumplings springs to life. But she finds that nothing stays cute and small forever.
+                {movie.description}
             </Description>
+            </>
+            )}
         </Container>
     )
 }
@@ -90,6 +118,7 @@ const PlayButton = styled.button`
     border: none;
     letter-spacing: 1.8px;
     cursor: pointer;
+
     &:hover {
         background: rgb(198, 198, 198);
     }
@@ -113,6 +142,7 @@ const AddButton = styled.button`
     border: 2px solid white;
     background-color: rgba(0, 0, 0, 0.6);
     cursor: pointer;
+
     span {
         font-size: 30px;
         color: white;
