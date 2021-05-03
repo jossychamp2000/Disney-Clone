@@ -11,6 +11,7 @@ function ImgSlider() {
         infinite: true,
         speed: 500,
         slidesToShow: 1,
+        slidesToScroll: 1,
         autoplay: true
     }
 
@@ -22,6 +23,14 @@ function ImgSlider() {
            <Wrap>
                <img src="/images/slider-badag.jpg" alt="" />
            </Wrap>
+           <Wrap>
+               <img src="/images/slider-scale.jpg" alt="" />
+           </Wrap>
+           <Wrap>
+               <img src="/images/slider-scales.jpg" alt="" />
+           </Wrap>
+
+
         </Carousel>
     )
 }
@@ -56,15 +65,14 @@ const Wrap = styled.div`
 cursor: pointer;
 img {
     border: 4px solid transparent;
-    border-radius: 4px;
-    width: 100%;
-    height: 100%;
-    box-shadow: rgb(0 0 0 / 9%) 0px 26px 30px -10px,
-    rgba(0 0 0 / 73%) 0px 16px 10px -10px;
-    transition-duration: 300ms;
-    
-    &:hover {
-        border: 4px solid rgba(249, 249, 249, 0.8);
+        border-radius: 4px;
+        width: 100%;
+        height: 100%;
+        box-shadow: rgb(0 0 0 / 69%) 0px 26px 30px -10px,
+        rgb(0 0 0 / 73%) 0px 16px 10px -10px;
+        transition-duration: 300ms;
+        &:hover {
+            border: 4px solid rgba(249, 249, 249, 0.8);
     }
 }
 
