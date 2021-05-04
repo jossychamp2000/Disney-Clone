@@ -1,41 +1,106 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { auth, provider } from "../firebase"
+import { 
+    selectUserName,
+    selectUserPhoto, 
+    setUserLogin,
+    setSignOut,   
+} from "../features/user/userSlice"
+
+
 
 function Header() {
-    return (
-        <Nav>
-            <Logo src="/images/logo.svg" alt="" />
-            <NavMenu>
-                <a>
-                    <img src="/images/home-icon.svg" alt="" />
-                    <span>HOME</span>
-                </a>
-                <a>
-                    <img src="/images/search-icon.svg" alt="" />
-                    <span>SEARCH</span>
-                </a>
-                <a>
-                    <img src="/images/watchlist-icon.svg" alt="" />
-                    <span>WATCHLIST</span>
-                </a>
-                <a>
-                    <img src="/images/original-icon.svg" alt="" />
-                    <span>ORIGINALS</span>
-                </a>
-                <a>
-                    <img src="/images/movie-icon.svg" alt="" />
-                    <span>MOVIES</span>
-                </a>
-                <a>
-                    <img src="/images/seriese-icon.svg" alt="" />
-                    <span>SERIES</span>
-                </a>
+   const dispatch = useDispatch();
+   const history = useHistory();
+   const userName = useSelector(selectUserName);
+   const userPhoto = useSelector(selectUserPhoto);
 
-            </NavMenu>
-            <UserImg src="/images/IMG_2755.jpg" alt="" />
-        </Nav>
-    )
-}
+   useEffect(() =>{
+    auth.onAuthStateChanged(async (user)=>{
+      if(user) {
+        dispatch(setUserLogin({
+          name: user.displayName,
+          email: user.email,
+          photo: user.photoURL
+      }))
+      history.push("/")
+      }
+    })
+
+ }, [])
+
+   const signIn = () => {
+     auth.signInWithPopup(provider)
+     .then((result)=>{
+          let user = result.user
+         dispatch(setUserLogin({
+             name: user.displayName,
+             email: user.email,
+             photo: user.photoURL
+         }))
+         history.push('/')
+     })
+   }
+
+  
+  const signOut = () => {
+    auth.signOut()
+    .then(()=>{
+        dispatch(setSignOut());
+        history.push("/login")
+
+    })
+  }
+   
+    return (
+        <Nav> 
+      <Logo src="/images/logo.svg" alt="Disney+" />
+      {!userName ? (
+          <LoginContainer>
+              <Login onClick={signIn}>Login</Login>
+          </LoginContainer>
+        ) : 
+        <>
+          <NavMenu>
+            <a href="/home">
+              <img src="/images/home-icon.svg" alt="HOME" />
+              <span>HOME</span>
+            </a>
+            <a>
+              <img src="/images/search-icon.svg" alt="SEARCH" />
+              <span>SEARCH</span>
+            </a>
+            <a>
+              <img src="/images/watchlist-icon.svg" alt="WATCHLIST" />
+              <span>WATCHLIST</span>
+            </a>
+            <a>
+              <img src="/images/original-icon.svg" alt="ORIGINALS" />
+              <span>ORIGINALS</span>
+            </a>
+            <a>
+              <img src="/images/movie-icon.svg" alt="MOVIES" />
+              <span>MOVIES</span>
+            </a>
+            <a>
+              <img src="/images/series-icon.svg" alt="SERIES" />
+              <span>SERIES</span>
+            </a>
+          </NavMenu>
+          
+            <UserImg onClick={signOut} 
+                    src ="/images/IMG_2755.jpg" />
+              
+        </>
+      }
+    </Nav>
+  );
+};
+
+
 
 export default Header
 
@@ -104,4 +169,67 @@ const UserImg = styled.img`
   height: 48px;
   border-radius: 50%;
   cursor: pointer;
+`
+
+const Login = styled.div`
+   border: 1px solid #f9f9f9;
+   padding: 8px 16px;
+   border-radius: 4px;
+   letter-spacing: 1.5px;
+   text-transform: uppercase;
+   background-color: rgba(0, 0, 0, 0.6);
+   transition: all 0.2s ease 0s;
+   cursor: pointer;
+
+   &:hover {
+       background-color: #f9f9f9;;
+       color: #000;
+       border-color: transparent;
+   }
+
+ `
+
+const LoginContainer =styled.div `
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+
+`
+
+
+
+const DropDown = styled.div`
+  position: absolute;
+  top: 48px;
+  right: 0px;
+  background: rgb(19, 19, 19);
+  border: 1px solid rgba(151, 151, 151, 0.34);
+  border-radius: 4px;
+  box-shadow: rgb(0 0 0 / 50%) 0px 0px 18px 0px;
+  padding: 10px;
+  font-size: 14px;
+  letter-spacing: 3px;
+  width: 100px;
+  opacity: 0;
+`;
+
+const SignOut = styled.div`
+  position: relative;
+  height: 48px;
+  width: 48px;
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  ${UserImg} {
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+  }
+  &:hover {
+    ${DropDown} {
+      opacity: 1;
+      transition-duration: 1s;
+    }
+  }
 `
